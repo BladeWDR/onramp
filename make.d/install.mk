@@ -42,7 +42,7 @@ ifneq ($(strip $(MISSING_REPOS)),)
 		MISSING_REPOS += update-distro
 endif
 
-EXECUTABLES = git nano jq yq python3-pip yamllint python3-pathspec ansible 
+EXECUTABLES = git nano jq python3-pip yamllint python3-pathspec ansible 
 MISSING_PACKAGES := $(foreach exec,$(EXECUTABLES),$(if $(shell dpkg -s "$(exec)" &> /dev/null),,addpackage-$(exec)))
 YQ_VERSION = v4.2.0
 YQ_BINARY = yq_linux_amd64
@@ -54,16 +54,11 @@ addrepo/%:
 	fi
 
 addpackage-%:
-	@if echo "$*" | grep -q "yq"; then \
+	@if ! command -v yq >/dev/null 2>&1; then \
 		wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz" -O - |\
-		tar xz && sudo mv ${YQ_BINARY} /usr/bin/yq; \
-		REMAINING_PACKAGES=$$(echo "$*" | sed 's/yq//g'); \
-		echo "Installing remaining packages: $$REMAINING_PACKAGES"; \
-		sudo apt install $$REMAINING_PACKAGES -y; \
-	else \
-		echo "$* does not contain yq"; \
-		sudo apt install $* -y; \
+		tar xz && mv ${YQ_BINARY} /usr/bin/yq; \
 	fi
+	sudo apt install $* -y; \
 
 update-distro:
 	sudo apt update

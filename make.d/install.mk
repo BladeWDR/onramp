@@ -34,7 +34,7 @@ install: build install-docker
 	cp --no-clobber .templates/env.template .env
 	$(EDITOR) .env
 
-REPOS = rmescandon/yq ansible/ansible
+REPOS = ansible/ansible
 MISSING_REPOS := $(foreach repo,$(REPOS),$(if $(shell apt-cache policy | grep $(repo)),,addrepo/$(repo))) 
 
 # If it's not empty, add a value to it
